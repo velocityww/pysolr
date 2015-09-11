@@ -734,6 +734,15 @@ class Solr(object):
                 doc_elem.set('boost', force_unicode(value))
                 continue
 
+            # If nested docs are specified, create docs for each element
+            if key == '_childDocuments_' and isinstance(value, list):
+                for child in value:
+                    if isinstance(child, dict):
+                        doc_elem.append(self._build_doc(child))
+                    else:
+                        logging.warn("Nested doc is not a dict")
+                continue
+
             # To avoid multiple code-paths we'd like to treat all of our values as iterables:
             if isinstance(value, (list, tuple)):
                 values = value
@@ -810,6 +819,7 @@ class Solr(object):
 
         end_time = time.time()
         self.log.debug("Built add request of %s docs in %0.2f seconds.", len(message), end_time - start_time)
+        #self.log.debug(ET.tostring(message))
         return self._update(m, commit=commit, softCommit=softCommit, waitFlush=waitFlush, waitSearcher=waitSearcher)
 
     def delete(self, id=None, q=None, commit=True, waitFlush=None, waitSearcher=None):
