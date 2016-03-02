@@ -639,7 +639,12 @@ class Solr(object):
         if result.get('highlighting'):
             result_kwargs['highlighting'] = result['highlighting']
 
-        if result.get('facet_counts'):
+        # Get facets preferentially from the response element of the new JSON API
+        # (facets), otherwise by the old-style facet_counts.
+        # They could in fact be combined without conflict, but that may be confusing.
+        if result.get('facets'):
+            result_kwargs['facets'] = result['facets']
+        elif result.get('facet_counts'):
             result_kwargs['facets'] = result['facet_counts']
 
         if result.get('spellcheck'):
