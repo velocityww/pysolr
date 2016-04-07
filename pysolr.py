@@ -642,13 +642,11 @@ class Solr(object):
         # Check for facets from both the "facets" response element of the new JSON API,
         # and from the old-style response element "facet_counts".
         # Both may be used in queries.
-        facets = {}
+        result_kwargs['facets'] = {}
         if result.get('facets'):
-            facets.update(result.get('facets'))
-            result_kwargs['facets'] = facets
+            result_kwargs['facets'].update(result.get('facets', {}))
         if result.get('facet_counts'):
-            facets.update(result.get('facet_counts'))
-            result_kwargs['facets'] = facets
+            result_kwargs['facets'].update(result.get('facet_counts', {}))
 
         if result.get('spellcheck'):
             result_kwargs['spellcheck'] = result['spellcheck']
